@@ -1,0 +1,636 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:ProyectoFinal.Models"
+             x:Class="ProyectoFinal.GamePage"
+             Title="Dardos">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="25" Padding="30,0">
+            <!-- Selector de modo de juego -->
+            <Frame BorderColor="Gray" Padding="20" Margin="0,20">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Modo de juego:"
+                           FontSize="18"
+                           HorizontalOptions="Center"/>
+                    <Picker x:Name="GameModePicker"
+                            SelectedItem="{Binding GameMode}"
+                            HorizontalOptions="Center"
+                            WidthRequest="200">
+                        <Picker.ItemsSource>
+                            <x:Array Type="{x:Type models:GameMode}">
+                                <x:Static Member="models:GameMode.X01"/>
+                                <x:Static Member="models:GameMode.Cricket"/>
+                            </x:Array>
+                        </Picker.ItemsSource>
+                    </Picker>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Gestión de jugadores -->
+            <Frame BorderColor="Purple" Padding="20" Margin="0,20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Gestión de Jugadores"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"/>
+                    
+                    <!-- Botón para seleccionar usuarios registrados -->
+                    <Button Text="Seleccionar Usuarios Registrados"
+                            Clicked="OnSelectUsersClicked"
+                            BackgroundColor="Blue"
+                            TextColor="White"
+                            HorizontalOptions="Center"/>
+                    
+                    <!-- Controles para añadir/eliminar jugadores -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Entry x:Name="NewPlayerNameEntry"
+                               Grid.Column="0"
+                               Placeholder="Nombre del jugador"
+                               HorizontalOptions="Fill"/>
+                        <Button Grid.Column="1"
+                                Text="Añadir Jugador"
+                                Clicked="OnAddPlayerClicked"
+                                HorizontalOptions="Fill"/>
+                    </Grid>
+                    
+                    <!-- Lista de jugadores -->
+                    <CollectionView ItemsSource="{Binding Players}"
+                                    HeightRequest="300">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame BorderColor="LightGray"
+                                       Padding="15"
+                                       Margin="0,5"
+                                       HasShadow="True">
+                                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto">
+                                        <Entry Grid.Column="0" Grid.Row="0"
+                                               Text="{Binding Name}"
+                                               FontSize="18"
+                                               HorizontalOptions="Fill"/>
+                                        <Label Grid.Column="1" Grid.Row="0"
+                                               Text="{Binding Score}"
+                                               FontSize="36"
+                                               FontAttributes="Bold"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"/>
+                                        
+                                        <!-- Estadísticas -->
+                                        <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1"
+                                              ColumnDefinitions="*,*,*" 
+                                              Margin="0,5">
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding AverageScore, StringFormat='Media: {0:F1}'}"
+                                                   FontSize="12"
+                                                   HorizontalOptions="Center"
+                                                   TextColor="Blue"/>
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding AverageCricketMarks, StringFormat='Marcas: {0:F2}'}"
+                                                   FontSize="12"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="Center"
+                                                   TextColor="Purple"/>
+                                            <Label Grid.Column="2"
+                                                   Text="{Binding TotalThrows, StringFormat='Tiros: {0}'}"
+                                                   FontSize="12"
+                                                   HorizontalOptions="Center"
+                                                   TextColor="Green"/>
+                                        </Grid>
+                                        
+                                        <!-- Estadísticas adicionales -->
+                                        <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2"
+                                              ColumnDefinitions="*,*" 
+                                              Margin="0,2">
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding TotalRounds, StringFormat='Rondas: {0}'}"
+                                                   FontSize="12"
+                                                   HorizontalOptions="Center"
+                                                   TextColor="DarkBlue"/>
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding WinPercentage, StringFormat='Victorias: {0:F1}%'}"
+                                                   FontSize="12"
+                                                   HorizontalOptions="Center"
+                                                   TextColor="Orange"/>
+                                        </Grid>
+                                        
+                                        <Frame Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3"
+                                               BorderColor="Green" 
+                                               HasShadow="True"
+                                               Padding="8" 
+                                               Margin="0,5">
+                                            <Label Text="Turno Actual" 
+                                                   HorizontalOptions="Center"
+                                                   FontSize="12"
+                                                   FontAttributes="Bold"/>
+                                        </Frame>
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Entrada de puntuación para X01 -->
+            <Frame BorderColor="Gray" Padding="20"
+                   IsVisible="{Binding GameMode, Converter={StaticResource StringEqualsConverter}, ConverterParameter={x:Static models:GameMode.X01}}">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Registro de lanzamientos X01:"
+                           FontSize="18"
+                           HorizontalOptions="Center"/>
+                    
+                    <!-- Información de la ronda actual -->
+                    <Frame BorderColor="Blue" Padding="10" Margin="0,10">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="{Binding CurrentRound.DisplayText}"
+                                   FontSize="16"
+                                   HorizontalOptions="Center"/>
+                            <Label Text="{Binding CurrentPlayer}"
+                                   FontSize="14"
+                                   HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                    
+                    <!-- Cooldown -->
+                    <Frame BorderColor="Red" BackgroundColor="Red" Padding="15" Margin="0,10"
+                           IsVisible="{Binding IsInCooldown}">
+                        <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                            <Label Text="⏰ Ronda completada!"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   TextColor="White"/>
+                            <Label Text="{Binding CooldownSeconds, StringFormat='Cambio de turno en {0} segundos...'}"
+                                   FontSize="16"
+                                   HorizontalOptions="Center"
+                                   TextColor="Yellow"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                    
+                    <!-- Lanzamientos de la ronda actual -->
+                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="15">
+                        <Label Grid.Column="0" Grid.Row="0" Text="Lanzamiento 1:" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center"/>
+                        <Label Grid.Column="1" Grid.Row="0" Text="Lanzamiento 2:" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center"/>
+                        <Label Grid.Column="2" Grid.Row="0" Text="Lanzamiento 3:" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center"/>
+                        
+                        <!-- Lanzamiento 1 -->
+                        <Frame Grid.Column="0" Grid.Row="1" 
+                               BorderColor="LightBlue" 
+                               BackgroundColor="LightBlue" 
+                               Padding="10" 
+                               HasShadow="True">
+                            <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                                <Label Text="{Binding CurrentRound.Throw1.DisplayText}"
+                                       FontSize="16" 
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="Center"
+                                       TextColor="DarkBlue"/>
+                                <Label Text="{Binding CurrentRound.Throw1.Points, StringFormat='{0} pts'}"
+                                       FontSize="14" 
+                                       HorizontalOptions="Center"
+                                       TextColor="DarkGreen"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                        
+                        <!-- Lanzamiento 2 -->
+                        <Frame Grid.Column="1" Grid.Row="1" 
+                               BorderColor="LightBlue" 
+                               BackgroundColor="LightBlue" 
+                               Padding="10" 
+                               HasShadow="True">
+                            <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                                <Label Text="{Binding CurrentRound.Throw2.DisplayText}"
+                                       FontSize="16" 
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="Center"
+                                       TextColor="DarkBlue"/>
+                                <Label Text="{Binding CurrentRound.Throw2.Points, StringFormat='{0} pts'}"
+                                       FontSize="14" 
+                                       HorizontalOptions="Center"
+                                       TextColor="DarkGreen"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                        
+                        <!-- Lanzamiento 3 -->
+                        <Frame Grid.Column="2" Grid.Row="1" 
+                               BorderColor="LightBlue" 
+                               BackgroundColor="LightBlue" 
+                               Padding="10" 
+                               HasShadow="True">
+                            <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                                <Label Text="{Binding CurrentRound.Throw3.DisplayText}"
+                                       FontSize="16" 
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="Center"
+                                       TextColor="DarkBlue"/>
+                                <Label Text="{Binding CurrentRound.Throw3.Points, StringFormat='{0} pts'}"
+                                       FontSize="14" 
+                                       HorizontalOptions="Center"
+                                       TextColor="DarkGreen"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                        
+                        <!-- Total de la ronda -->
+                        <Frame Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2" 
+                               BorderColor="DarkBlue" 
+                               BackgroundColor="DarkBlue" 
+                               Padding="15" 
+                               HasShadow="True">
+                            <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                                <Label Text="Total de la ronda:"
+                                       FontSize="16" 
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="Center"
+                                       TextColor="White"/>
+                                <Label Text="{Binding CurrentRound.TotalPoints, StringFormat='{0} puntos'}"
+                                       FontSize="20" 
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="Center"
+                                       TextColor="Yellow"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </Grid>
+                    
+                    <!-- Entrada de lanzamiento -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10" RowSpacing="10">
+                        <Picker x:Name="X01NumberPicker"
+                                Grid.Column="0"
+                                Title="Número"
+                                HorizontalOptions="Center">
+                            <Picker.ItemsSource>
+                                <x:Array Type="{x:Type x:Int32}">
+                                    <x:Int32>0</x:Int32>
+                                    <x:Int32>1</x:Int32>
+                                    <x:Int32>2</x:Int32>
+                                    <x:Int32>3</x:Int32>
+                                    <x:Int32>4</x:Int32>
+                                    <x:Int32>5</x:Int32>
+                                    <x:Int32>6</x:Int32>
+                                    <x:Int32>7</x:Int32>
+                                    <x:Int32>8</x:Int32>
+                                    <x:Int32>9</x:Int32>
+                                    <x:Int32>10</x:Int32>
+                                    <x:Int32>11</x:Int32>
+                                    <x:Int32>12</x:Int32>
+                                    <x:Int32>13</x:Int32>
+                                    <x:Int32>14</x:Int32>
+                                    <x:Int32>15</x:Int32>
+                                    <x:Int32>16</x:Int32>
+                                    <x:Int32>17</x:Int32>
+                                    <x:Int32>18</x:Int32>
+                                    <x:Int32>19</x:Int32>
+                                    <x:Int32>20</x:Int32>
+                                    <x:Int32>25</x:Int32>
+                                </x:Array>
+                            </Picker.ItemsSource>
+                        </Picker>
+                        <Picker x:Name="X01MarksPicker"
+                                Grid.Column="1"
+                                Title="Marcas"
+                                HorizontalOptions="Center">
+                            <Picker.ItemsSource>
+                                <x:Array Type="{x:Type x:Int32}">
+                                    <x:Int32>1</x:Int32>
+                                    <x:Int32>2</x:Int32>
+                                    <x:Int32>3</x:Int32>
+                                </x:Array>
+                            </Picker.ItemsSource>
+                        </Picker>
+                    </Grid>
+                    
+                    <Button Text="Registrar Lanzamiento"
+                            Clicked="OnX01ThrowSubmitted"
+                            HorizontalOptions="Center"/>
+                    <Button Text="Deshacer Último Lanzamiento"
+                            Clicked="OnUndoLastThrow"
+                            HorizontalOptions="Center"/>
+                    
+                    <!-- Combinaciones de cierre para X01 -->
+                    <Frame BorderColor="Orange" Padding="15" Margin="0,10"
+                           IsVisible="{Binding CheckoutCombinations.Count, Converter={StaticResource InvertedBoolConverter}}">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="💡 Combinaciones de cierre disponibles:"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   TextColor="Orange"/>
+                            <CollectionView ItemsSource="{Binding CheckoutCombinations}"
+                                          HeightRequest="120">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Frame BorderColor="LightGray" Padding="8" Margin="0,2">
+                                            <Label Text="{Binding DisplayText}"
+                                                   FontSize="14"
+                                                   HorizontalOptions="Center"
+                                                   TextColor="DarkBlue"/>
+                                        </Frame>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Frame>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Entrada de puntuación para Cricket -->
+            <Frame BorderColor="Gray" Padding="20"
+                   IsVisible="{Binding GameMode, Converter={StaticResource StringEqualsConverter}, ConverterParameter={x:Static models:GameMode.Cricket}}">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Registro de lanzamientos Cricket:"
+                           FontSize="18"
+                           HorizontalOptions="Center"/>
+                    
+                    <!-- Información de la ronda actual -->
+                    <Frame BorderColor="Blue" Padding="10" Margin="0,10">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="{Binding CurrentRound.DisplayText}"
+                                   FontSize="16"
+                                   HorizontalOptions="Center"/>
+                            <Label Text="{Binding CurrentPlayer}"
+                                   FontSize="14"
+                                   HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                    
+                    <!-- Puntuaciones de Cricket para todos los jugadores -->
+                    <Frame BorderColor="Green" Padding="15" Margin="0,10">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Puntuaciones de Cricket"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   TextColor="DarkGreen"/>
+                            
+                            <CollectionView ItemsSource="{Binding CricketPlayerInfos}"
+                                            HeightRequest="200">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Frame BorderColor="LightGreen" Padding="10" Margin="0,5">
+                                            <VerticalStackLayout Spacing="5">
+                                                <Label Text="{Binding Name}"
+                                                       FontSize="16"
+                                                       FontAttributes="Bold"
+                                                       HorizontalOptions="Center"
+                                                       TextColor="DarkGreen"/>
+                                                
+                                                <!-- Grid para mostrar números y marcas -->
+                                                <Grid ColumnDefinitions="*,*,*,*,*,*,*,*" 
+                                                      RowDefinitions="Auto,Auto" 
+                                                      ColumnSpacing="5" 
+                                                      RowSpacing="5">
+                                                    
+                                                    <!-- Headers -->
+                                                    <Label Grid.Column="0" Grid.Row="0" Text="0" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center"/>
+                                                    <Label Grid.Column="1" Grid.Row="0" Text="15" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center"/>
+                                                    <Label Grid.Column="2" Grid.Row="0" Text="16" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center"/>
+                                                    <Label Grid.Column="3" Grid.Row="0" Text="17" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center"/>
+                                                    <Label Grid.Column="4" Grid.Row="0" Text="18" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center"/>
+                                                    <Label Grid.Column="5" Grid.Row="0" Text="19" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center"/>
+                                                    <Label Grid.Column="6" Grid.Row="0" Text="20" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center"/>
+                                                    <Label Grid.Column="7" Grid.Row="0" Text="25" FontSize="12" FontAttributes="Bold" HorizontalOptions="Center"/>
+                                                    
+                                                    <!-- Marcas para cada número -->
+                                                    <Frame Grid.Column="0" Grid.Row="1" 
+                                                           BorderColor="Gray" 
+                                                           BackgroundColor="LightGray" 
+                                                           Padding="5">
+                                                        <Label Text="{Binding CricketMarks0, StringFormat='{0}/3'}"
+                                                               FontSize="12"
+                                                               FontAttributes="Bold"
+                                                               HorizontalOptions="Center"/>
+                                                    </Frame>
+                                                    
+                                                    <Frame Grid.Column="1" Grid.Row="1" 
+                                                           BorderColor="Gray" 
+                                                           BackgroundColor="LightGray" 
+                                                           Padding="5">
+                                                        <Label Text="{Binding CricketMarks15, StringFormat='{0}/3'}"
+                                                               FontSize="12"
+                                                               FontAttributes="Bold"
+                                                               HorizontalOptions="Center"/>
+                                                    </Frame>
+                                                    
+                                                    <Frame Grid.Column="2" Grid.Row="1" 
+                                                           BorderColor="Gray" 
+                                                           BackgroundColor="LightGray" 
+                                                           Padding="5">
+                                                        <Label Text="{Binding CricketMarks16, StringFormat='{0}/3'}"
+                                                               FontSize="12"
+                                                               FontAttributes="Bold"
+                                                               HorizontalOptions="Center"/>
+                                                    </Frame>
+                                                    
+                                                    <Frame Grid.Column="3" Grid.Row="1" 
+                                                           BorderColor="Gray" 
+                                                           BackgroundColor="LightGray" 
+                                                           Padding="5">
+                                                        <Label Text="{Binding CricketMarks17, StringFormat='{0}/3'}"
+                                                               FontSize="12"
+                                                               FontAttributes="Bold"
+                                                               HorizontalOptions="Center"/>
+                                                    </Frame>
+                                                    
+                                                    <Frame Grid.Column="4" Grid.Row="1" 
+                                                           BorderColor="Gray" 
+                                                           BackgroundColor="LightGray" 
+                                                           Padding="5">
+                                                        <Label Text="{Binding CricketMarks18, StringFormat='{0}/3'}"
+                                                               FontSize="12"
+                                                               FontAttributes="Bold"
+                                                               HorizontalOptions="Center"/>
+                                                    </Frame>
+                                                    
+                                                    <Frame Grid.Column="5" Grid.Row="1" 
+                                                           BorderColor="Gray" 
+                                                           BackgroundColor="LightGray" 
+                                                           Padding="5">
+                                                        <Label Text="{Binding CricketMarks19, StringFormat='{0}/3'}"
+                                                               FontSize="12"
+                                                               FontAttributes="Bold"
+                                                               HorizontalOptions="Center"/>
+                                                    </Frame>
+                                                    
+                                                    <Frame Grid.Column="6" Grid.Row="1" 
+                                                           BorderColor="Gray" 
+                                                           BackgroundColor="LightGray" 
+                                                           Padding="5">
+                                                        <Label Text="{Binding CricketMarks20, StringFormat='{0}/3'}"
+                                                               FontSize="12"
+                                                               FontAttributes="Bold"
+                                                               HorizontalOptions="Center"/>
+                                                    </Frame>
+                                                    
+                                                    <Frame Grid.Column="7" Grid.Row="1" 
+                                                           BorderColor="Gray" 
+                                                           BackgroundColor="LightGray" 
+                                                           Padding="5">
+                                                        <Label Text="{Binding CricketMarks25, StringFormat='{0}/3'}"
+                                                               FontSize="12"
+                                                               FontAttributes="Bold"
+                                                               HorizontalOptions="Center"/>
+                                                    </Frame>
+                                                </Grid>
+                                                
+                                                <!-- Indicador de números cerrados -->
+                                                <Label Text="{Binding ClosedNumbersText}"
+                                                       FontSize="12"
+                                                       HorizontalOptions="Center"
+                                                       TextColor="Blue"/>
+                                            </VerticalStackLayout>
+                                        </Frame>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Frame>
+                    
+                    <!-- Cooldown -->
+                    <Frame BorderColor="Red" BackgroundColor="Red" Padding="15" Margin="0,10"
+                           IsVisible="{Binding IsInCooldown}">
+                        <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                            <Label Text="⏰ Ronda completada!"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   TextColor="White"/>
+                            <Label Text="{Binding CooldownSeconds, StringFormat='Cambio de turno en {0} segundos...'}"
+                                   FontSize="16"
+                                   HorizontalOptions="Center"
+                                   TextColor="Yellow"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                    
+                    <!-- Lanzamientos de la ronda actual -->
+                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="15">
+                        <Label Grid.Column="0" Grid.Row="0" Text="Lanzamiento 1:" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center"/>
+                        <Label Grid.Column="1" Grid.Row="0" Text="Lanzamiento 2:" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center"/>
+                        <Label Grid.Column="2" Grid.Row="0" Text="Lanzamiento 3:" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center"/>
+                        
+                        <!-- Lanzamiento 1 -->
+                        <Frame Grid.Column="0" Grid.Row="1" 
+                               BorderColor="LightGreen" 
+                               BackgroundColor="LightGreen" 
+                               Padding="10" 
+                               HasShadow="True">
+                            <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                                <Label Text="{Binding CurrentRound.Throw1.DisplayText}"
+                                       FontSize="16" 
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="Center"
+                                       TextColor="DarkGreen"/>
+                                <Label Text="{Binding CurrentRound.Throw1.Points, StringFormat='{0} pts'}"
+                                       FontSize="14" 
+                                       HorizontalOptions="Center"
+                                       TextColor="DarkBlue"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                        
+                        <!-- Lanzamiento 2 -->
+                        <Frame Grid.Column="1" Grid.Row="1" 
+                               BorderColor="LightGreen" 
+                               BackgroundColor="LightGreen" 
+                               Padding="10" 
+                               HasShadow="True">
+                            <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                                <Label Text="{Binding CurrentRound.Throw2.DisplayText}"
+                                       FontSize="16" 
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="Center"
+                                       TextColor="DarkGreen"/>
+                                <Label Text="{Binding CurrentRound.Throw2.Points, StringFormat='{0} pts'}"
+                                       FontSize="14" 
+                                       HorizontalOptions="Center"
+                                       TextColor="DarkBlue"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                        
+                        <!-- Lanzamiento 3 -->
+                        <Frame Grid.Column="2" Grid.Row="1" 
+                               BorderColor="LightGreen" 
+                               BackgroundColor="LightGreen" 
+                               Padding="10" 
+                               HasShadow="True">
+                            <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                                <Label Text="{Binding CurrentRound.Throw3.DisplayText}"
+                                       FontSize="16" 
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="Center"
+                                       TextColor="DarkGreen"/>
+                                <Label Text="{Binding CurrentRound.Throw3.Points, StringFormat='{0} pts'}"
+                                       FontSize="14" 
+                                       HorizontalOptions="Center"
+                                       TextColor="DarkBlue"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                        
+                        <!-- Total de la ronda -->
+                        <Frame Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2" 
+                               BorderColor="DarkGreen" 
+                               BackgroundColor="DarkGreen" 
+                               Padding="15" 
+                               HasShadow="True">
+                            <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                                <Label Text="Total de la ronda:"
+                                       FontSize="16" 
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="Center"
+                                       TextColor="White"/>
+                                <Label Text="{Binding CurrentRound.TotalPoints, StringFormat='{0} puntos'}"
+                                       FontSize="20" 
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="Center"
+                                       TextColor="Yellow"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </Grid>
+                    
+                    <!-- Entrada de lanzamiento -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10" RowSpacing="10">
+                        <Picker x:Name="CricketNumberPicker"
+                                Grid.Column="0"
+                                Title="Número"
+                                HorizontalOptions="Center">
+                            <Picker.ItemsSource>
+                                <x:Array Type="{x:Type x:Int32}">
+                                    <x:Int32>0</x:Int32>
+                                    <x:Int32>15</x:Int32>
+                                    <x:Int32>16</x:Int32>
+                                    <x:Int32>17</x:Int32>
+                                    <x:Int32>18</x:Int32>
+                                    <x:Int32>19</x:Int32>
+                                    <x:Int32>20</x:Int32>
+                                    <x:Int32>25</x:Int32>
+                                </x:Array>
+                            </Picker.ItemsSource>
+                        </Picker>
+                        <Picker x:Name="CricketMarksPicker"
+                                Grid.Column="1"
+                                Title="Marcas"
+                                HorizontalOptions="Center">
+                            <Picker.ItemsSource>
+                                <x:Array Type="{x:Type x:Int32}">
+                                    <x:Int32>1</x:Int32>
+                                    <x:Int32>2</x:Int32>
+                                    <x:Int32>3</x:Int32>
+                                </x:Array>
+                            </Picker.ItemsSource>
+                        </Picker>
+                    </Grid>
+                    
+                    <Button Text="Registrar Lanzamiento"
+                            Clicked="OnCricketThrowSubmitted"
+                            HorizontalOptions="Center"/>
+                    <Button Text="Deshacer Último Lanzamiento"
+                            Clicked="OnUndoLastThrow"
+                            HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Botón para reiniciar juego -->
+            <Button Text="Nuevo Juego"
+                    Clicked="OnNewGameClicked"
+                    HorizontalOptions="Center"/>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

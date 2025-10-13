@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ProyectoFinal.MainPage"
+             BackgroundImageSource="diana.jpg">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+            <Label
+                Text="Menú Principal"
+                SemanticProperties.HeadingLevel="Level1"
+                FontSize="32"
+                TextColor="White"
+                HorizontalOptions="Center" />
+            
+            <Label
+                Text="Juego"
+                SemanticProperties.HeadingLevel="Level4"
+                FontSize="26"
+                TextColor="White"
+                HorizontalOptions="Center" />
+            
+            <HorizontalStackLayout
+                HorizontalOptions="Center"
+                Spacing="10">
+                <Button
+                    x:Name="Button1"
+                    Text="Jugar con Usuarios Registrados"
+                    SemanticProperties.Hint="Navegar a la selección de jugadores"
+                    Clicked="OnButton1Clicked"
+                    BackgroundColor="Green"
+                    TextColor="White"
+                    HorizontalOptions="Center" />
+
+                <Button
+                    x:Name="Button1b"
+                    Text="Juego Rápido"
+                    SemanticProperties.Hint="Navegar directamente al juego"
+                    Clicked="OnButton1bClicked"
+                    BackgroundColor="Green"
+                    TextColor="White"
+                    HorizontalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <Label
+                Text="Estadísticas"
+                SemanticProperties.HeadingLevel="Level4"
+                FontSize="26"
+                TextColor="White"
+                HorizontalOptions="Center" />
+            
+            <HorizontalStackLayout
+                HorizontalOptions="Center"
+                Spacing="10">
+                <Button
+                    x:Name="Button2"
+                    Text="Ver Estadísticas"
+                    SemanticProperties.Hint="Navegar a la página de estadísticas"
+                    Clicked="OnButton2Clicked"
+                    BackgroundColor="Blue"
+                    TextColor="White"
+                    HorizontalOptions="Center" />
+
+                <Button
+                    x:Name="Button3"
+                    Text="Gestionar Usuario"
+                    SemanticProperties.Hint="Navegar a la página de gestión de usuario"
+                    Clicked="OnButton3Clicked"
+                    BackgroundColor="Blue"
+                    TextColor="White"
+                    HorizontalOptions="Center" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

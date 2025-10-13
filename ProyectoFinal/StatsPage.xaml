@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ProyectoFinal.StatsPage"
+             Title="Estadísticas">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="25" Padding="30,0">
+            <Label 
+                Text="Estadísticas de Juego"
+                SemanticProperties.HeadingLevel="Level1"
+                FontSize="32"
+                HorizontalOptions="Center" />
+
+            <!-- Estado de usuario -->
+            <Frame BorderColor="Gray" Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label x:Name="UserStatusLabel"
+                           Text="No hay usuario logueado"
+                           FontSize="18"
+                           HorizontalOptions="Center"/>
+                    
+                    <Button Text="Gestionar Usuario"
+                            Clicked="OnManageUserClicked"
+                            BackgroundColor="Blue"
+                            TextColor="White"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Estadísticas generales -->
+            <Frame BorderColor="LightBlue" Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Estadísticas Generales"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"/>
+                    
+                    <Label x:Name="TotalGamesLabel"
+                           Text="Partidas jugadas: 0"
+                           FontSize="18"/>
+                    
+                    <Label x:Name="GamesWonLabel"
+                           Text="Partidas ganadas: 0"
+                           FontSize="18"/>
+                    
+                    <Label x:Name="WinPercentageLabel"
+                           Text="Porcentaje de victorias: 0%"
+                           FontSize="18"/>
+                    
+                    <Label x:Name="BestScoreLabel"
+                           Text="Mejor puntuación: --"
+                           FontSize="18"/>
+                    
+                    <Label x:Name="AverageTurnsLabel"
+                           Text="Promedio de turnos por partida: --"
+                           FontSize="18"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Estadísticas de lanzamientos -->
+            <Frame BorderColor="LightGreen" Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Estadísticas de Lanzamientos"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"/>
+                    
+                    <Label x:Name="TotalThrowsLabel"
+                           Text="Total de lanzamientos: 0"
+                           FontSize="18"/>
+                    
+                    <Label x:Name="TotalPointsLabel"
+                           Text="Total de puntos: 0"
+                           FontSize="18"/>
+                    
+                    <Label x:Name="AverageScoreLabel"
+                           Text="Puntuación promedio: 0.0"
+                           FontSize="18"/>
+                    
+                    <Label x:Name="TotalCricketMarksLabel"
+                           Text="Marcas de Cricket: 0"
+                           FontSize="18"/>
+                    
+                    <Label x:Name="AverageCricketMarksLabel"
+                           Text="Promedio de marcas Cricket: 0.0"
+                           FontSize="18"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Estadísticas por modo de juego -->
+            <Frame BorderColor="Orange" Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Estadísticas por Modo de Juego"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"/>
+                    
+                    <Label Text="X01:"
+                           FontSize="16"
+                           FontAttributes="Bold"/>
+                    
+                    <Label x:Name="X01GamesLabel"
+                           Text="Partidas X01: 0"
+                           FontSize="16"
+                           Margin="20,0,0,0"/>
+                    
+                    <Label x:Name="X01WinsLabel"
+                           Text="Victorias X01: 0"
+                           FontSize="16"
+                           Margin="20,0,0,0"/>
+                    
+                    <Label Text="Cricket:"
+                           FontSize="16"
+                           FontAttributes="Bold"/>
+                    
+                    <Label x:Name="CricketGamesLabel"
+                           Text="Partidas Cricket: 0"
+                           FontSize="16"
+                           Margin="20,0,0,0"/>
+                    
+                    <Label x:Name="CricketWinsLabel"
+                           Text="Victorias Cricket: 0"
+                           FontSize="16"
+                           Margin="20,0,0,0"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Información adicional -->
+            <Frame BorderColor="Purple" Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Información Adicional"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"/>
+                    
+                    <Label x:Name="LastGameLabel"
+                           Text="Última partida: Nunca"
+                           FontSize="16"/>
+                    
+                    <Label x:Name="RegistrationDateLabel"
+                           Text="Fecha de registro: --"
+                           FontSize="16"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Botones de navegación -->
+            <VerticalStackLayout Spacing="15">
+                <Button Text="Volver al Menú Principal"
+                        Clicked="OnGoToMainClicked"
+                        BackgroundColor="Gray"
+                        TextColor="White"/>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ProyectoFinal.UserManagementPage"
+             Title="Gestión de Usuario">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="25" Padding="30,0">
+            <Label 
+                Text="Gestión de Usuario"
+                SemanticProperties.HeadingLevel="Level1"
+                FontSize="32"
+                HorizontalOptions="Center" />
+
+            <!-- Estado de sesión -->
+            <Frame BorderColor="Gray" Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label x:Name="SessionStatusLabel"
+                           Text="No hay usuario logueado"
+                           FontSize="18"
+                           HorizontalOptions="Center"/>
+                    
+                    <Label x:Name="CurrentUserLabel"
+                           Text=""
+                           FontSize="16"
+                           HorizontalOptions="Center"
+                           IsVisible="False"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Registro de usuario -->
+            <Frame BorderColor="LightBlue" Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Registrar Nuevo Usuario"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"/>
+                    
+                    <Entry x:Name="RegisterUsernameEntry"
+                           Placeholder="Nombre de usuario"
+                           TextChanged="OnRegisterTextChanged"/>
+                    
+                    <Entry x:Name="RegisterEmailEntry"
+                           Placeholder="Email"
+                           Keyboard="Email"
+                           TextChanged="OnRegisterTextChanged"/>
+                    
+                    <Button x:Name="RegisterButton"
+                            Text="Registrar"
+                            Clicked="OnRegisterClicked"
+                            IsEnabled="False"/>
+                    
+                    <Label x:Name="RegisterMessageLabel"
+                           Text=""
+                           FontSize="14"
+                           HorizontalOptions="Center"
+                           TextColor="Green"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Inicio de sesión -->
+            <Frame BorderColor="LightGreen" Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Iniciar Sesión"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"/>
+                    
+                    <Picker x:Name="LoginUserPicker"
+                            Title="Seleccionar usuario"
+                            ItemDisplayBinding="{Binding Username}"
+                            SelectedIndexChanged="OnLoginUserChanged"/>
+                    
+                    <Button x:Name="LoginButton"
+                            Text="Iniciar Sesión"
+                            Clicked="OnLoginClicked"
+                            IsEnabled="False"/>
+                    
+                    <Button x:Name="LogoutButton"
+                            Text="Cerrar Sesión"
+                            Clicked="OnLogoutClicked"
+                            IsVisible="False"/>
+                    
+                    <Label x:Name="LoginMessageLabel"
+                           Text=""
+                           FontSize="14"
+                           HorizontalOptions="Center"
+                           TextColor="Green"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Lista de usuarios registrados -->
+            <Frame BorderColor="Orange" Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Usuarios Registrados"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"/>
+                    
+                    <CollectionView x:Name="UsersCollectionView"
+                                    ItemsSource="{Binding Users}"
+                                    HeightRequest="200">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <VerticalStackLayout Grid.Column="0">
+                                        <Label Text="{Binding Username}" FontSize="16" FontAttributes="Bold"/>
+                                        <Label Text="{Binding Email}" FontSize="14" TextColor="Gray"/>
+                                        <Label Text="{Binding RegistrationDate, StringFormat='Registrado: {0:dd/MM/yyyy}'}" 
+                                               FontSize="12" TextColor="DarkGray"/>
+                                    </VerticalStackLayout>
+                                    
+                                    <Button Grid.Column="1"
+                                            Text="Eliminar"
+                                            BackgroundColor="Red"
+                                            TextColor="White"
+                                            Clicked="OnDeleteUserClicked"
+                                            CommandParameter="{Binding Id}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Botones de navegación -->
+            <VerticalStackLayout Spacing="15">
+                <Button Text="Ir a Estadísticas"
+                        Clicked="OnGoToStatsClicked"
+                        BackgroundColor="Purple"
+                        TextColor="White"/>
+                
+                <Button Text="Volver al Menú Principal"
+                        Clicked="OnGoToMainClicked"
+                        BackgroundColor="Gray"
+                        TextColor="White"/>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
+

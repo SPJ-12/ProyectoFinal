@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ProyectoFinal.PlayerSelectionPage"
+             Title="Seleccionar Jugadores">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="25" Padding="30,0">
+            <Label 
+                Text="Seleccionar Jugadores"
+                SemanticProperties.HeadingLevel="Level1"
+                FontSize="32"
+                HorizontalOptions="Center" />
+
+            <!-- Información -->
+            <Frame BorderColor="Blue" Padding="20">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Selecciona usuarios registrados para que sus estadísticas se registren automáticamente durante el juego."
+                           FontSize="16"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Máximo 4 jugadores, mínimo 2."
+                           FontSize="14"
+                           HorizontalOptions="Center"
+                           TextColor="Gray"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Lista de usuarios disponibles -->
+            <Frame BorderColor="Green" Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Usuarios Registrados Disponibles"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"/>
+                    
+                    <CollectionView x:Name="AvailableUsersCollectionView"
+                                    ItemsSource="{Binding AvailableUsers}"
+                                    HeightRequest="300">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame BorderColor="LightGray" Padding="15" Margin="0,5">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <VerticalStackLayout Grid.Column="0">
+                                            <Label Text="{Binding Username}" 
+                                                   FontSize="18" 
+                                                   FontAttributes="Bold"/>
+                                            <Label Text="{Binding Email}" 
+                                                   FontSize="14" 
+                                                   TextColor="Gray"/>
+                                            <Label Text="{Binding RegistrationDate, StringFormat='Registrado: {0:dd/MM/yyyy}'}" 
+                                                   FontSize="12" 
+                                                   TextColor="DarkGray"/>
+                                        </VerticalStackLayout>
+                                        
+                                        <Button Grid.Column="1"
+                                                Text="Seleccionar"
+                                                BackgroundColor="Green"
+                                                TextColor="White"
+                                                Clicked="OnSelectUserClicked"
+                                                CommandParameter="{Binding Id}"/>
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Jugadores seleccionados -->
+            <Frame BorderColor="Purple" Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Jugadores Seleccionados"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"/>
+                    
+                    <CollectionView x:Name="SelectedPlayersCollectionView"
+                                    ItemsSource="{Binding SelectedPlayers}"
+                                    HeightRequest="200">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame BorderColor="Purple" Padding="15" Margin="0,5">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <VerticalStackLayout Grid.Column="0">
+                                            <Label Text="{Binding Username}" 
+                                                   FontSize="18" 
+                                                   FontAttributes="Bold"/>
+                                            <Label Text="{Binding Email}" 
+                                                   FontSize="14" 
+                                                   TextColor="Gray"/>
+                                        </VerticalStackLayout>
+                                        
+                                        <Button Grid.Column="1"
+                                                Text="Eliminar"
+                                                BackgroundColor="Red"
+                                                TextColor="White"
+                                                Clicked="OnRemovePlayerClicked"
+                                                CommandParameter="{Binding Id}"/>
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Opción para agregar jugador invitado -->
+            <Frame BorderColor="Orange" Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Agregar Jugador Invitado"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"/>
+                    
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <Entry x:Name="GuestPlayerNameEntry"
+                               Grid.Column="0"
+                               Placeholder="Nombre del jugador invitado"
+                               HorizontalOptions="Fill"/>
+                        <Button Grid.Column="1"
+                                Text="Agregar"
+                                Clicked="OnAddGuestPlayerClicked"
+                                HorizontalOptions="Fill"/>
+                    </Grid>
+                    
+                    <Label Text="Los jugadores invitados no tendrán estadísticas registradas."
+                           FontSize="12"
+                           HorizontalOptions="Center"
+                           TextColor="Gray"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Botones de acción -->
+            <VerticalStackLayout Spacing="15">
+                <Button Text="Iniciar Juego"
+                        Clicked="OnStartGameClicked"
+                        BackgroundColor="Green"
+                        TextColor="White"
+                        IsEnabled="{Binding CanStartGame}"/>
+                
+                <Button Text="Cancelar"
+                        Clicked="OnCancelClicked"
+                        BackgroundColor="Gray"
+                        TextColor="White"/>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
+
