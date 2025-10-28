@@ -12,6 +12,12 @@ public partial class GamePage : ContentPage
         InitializeComponent();
         _selectedUsers = new List<User>();
         StartNewGame();
+        
+        // Subscribe to X01 variant picker changes
+        if (X01VariantPicker != null)
+        {
+            X01VariantPicker.SelectedIndexChanged += OnX01VariantChanged;
+        }
     }
 
     public GamePage(List<User> selectedUsers)
@@ -19,35 +25,59 @@ public partial class GamePage : ContentPage
         InitializeComponent();
         _selectedUsers = selectedUsers ?? new List<User>();
         StartNewGame();
+        
+        // Subscribe to X01 variant picker changes
+        if (X01VariantPicker != null)
+        {
+            X01VariantPicker.SelectedIndexChanged += OnX01VariantChanged;
+        }
+    }
+    
+    private void OnX01VariantChanged(object sender, EventArgs e)
+    {
+        if (X01VariantPicker?.SelectedItem is int selectedScore && _game != null)
+        {
+            // Update the X01 initial score
+            _game.X01InitialScore = selectedScore;
+        }
     }
 
     private void StartNewGame()
     {
         var currentMode = _game?.GameMode ?? GameMode.X01;
+        var currentX01Score = _game?.X01InitialScore ?? 501;
         _game = new DartsGame(currentMode);
+        
+        // Configurar la puntuación inicial de X01 ANTES de agregar jugadores
+        if (currentMode == GameMode.X01)
+        {
+            _game.X01InitialScore = currentX01Score;
+        }
         
         // Limpiar jugadores existentes y agregar los usuarios seleccionados
         _game.ClearPlayers();
+        
+        // Agregar jugadores con la puntuación correcta
+        int initialScoreForNewPlayers = currentMode == GameMode.X01 ? currentX01Score : 0;
         
         if (_selectedUsers.Any())
         {
             foreach (var user in _selectedUsers)
             {
-                int initialScore = currentMode == GameMode.X01 ? 501 : 0;
-                _game.AddPlayer(user.Username, initialScore, user.Id);
+                _game.AddPlayer(user.Username, initialScoreForNewPlayers, user.Id);
             }
         }
         else
         {
             // Si no hay usuarios seleccionados, usar jugadores por defecto
-            _game.AddPlayer("Jugador 1");
-            _game.AddPlayer("Jugador 2");
+            _game.AddPlayer("Jugador 1", initialScoreForNewPlayers);
+            _game.AddPlayer("Jugador 2", initialScoreForNewPlayers);
         }
         
         BindingContext = _game;
         
         // Debug: Verificar que los jugadores se crearon
-        System.Diagnostics.Debug.WriteLine($"Jugadores creados: {_game.Players.Count}");
+        System.Diagnostics.Debug.WriteLine($"Jugadores creados con puntuación inicial {initialScoreForNewPlayers}: {_game.Players.Count}");
         foreach (var player in _game.Players)
         {
             System.Diagnostics.Debug.WriteLine($"- {player.Name}: {player.Score}, Usuario ID: {player.UserId}, Media Cricket: {player.AverageCricketMarks:F2}, Rondas: {player.TotalRounds}");

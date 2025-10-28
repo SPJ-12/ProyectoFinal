@@ -11,6 +11,7 @@ public class DartsGame : INotifyPropertyChanged
     private readonly int[] CRICKET_NUMBERS = { 0, 15, 16, 17, 18, 19, 20, 25 }; // 25 = Bull
     private readonly int[] CRICKET_CLOSABLE_NUMBERS = { 15, 16, 17, 18, 19, 20, 25 }; // Números que se pueden cerrar (sin el 0)
     private GameMode _gameMode;
+    private int _x01InitialScore = 501;
     private ObservableCollection<Player> _players = new();
     private ObservableCollection<CricketPlayerInfo> _cricketPlayerInfos = new();
     private int _currentPlayerIndex = 0;
@@ -89,6 +90,28 @@ public class DartsGame : INotifyPropertyChanged
                 
                 // Notificar cambio en CricketPlayerInfos
                 OnPropertyChanged(nameof(CricketPlayerInfos));
+            }
+        }
+    }
+
+    public int X01InitialScore
+    {
+        get => _x01InitialScore;
+        set
+        {
+            if (_x01InitialScore != value && (value == 301 || value == 501 || value == 701))
+            {
+                _x01InitialScore = value;
+                OnPropertyChanged();
+                
+                // Si estamos en modo X01, resetear los puntajes de los jugadores
+                if (_gameMode == GameMode.X01)
+                {
+                    foreach (var player in _players)
+                    {
+                        player.Score = _x01InitialScore;
+                    }
+                }
             }
         }
     }
@@ -232,7 +255,7 @@ public class DartsGame : INotifyPropertyChanged
 
         if (initialScore == -1)
         {
-            initialScore = _gameMode == GameMode.X01 ? 501 : 0;
+            initialScore = _gameMode == GameMode.X01 ? _x01InitialScore : 0;
         }
         
         var newPlayer = new Player(playerName, initialScore, userId);
@@ -811,7 +834,7 @@ public class DartsGame : INotifyPropertyChanged
         {
             foreach (var player in _players)
             {
-                player.Score = 501;
+                player.Score = _x01InitialScore;
             }
         }
         else

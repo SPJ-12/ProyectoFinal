@@ -24,6 +24,21 @@
                             </x:Array>
                         </Picker.ItemsSource>
                     </Picker>
+                    
+                    <!-- Selector de variante X01 -->
+                    <Picker x:Name="X01VariantPicker"
+                            SelectedItem="{Binding X01InitialScore}"
+                            HorizontalOptions="Center"
+                            WidthRequest="200"
+                            IsVisible="{Binding GameMode, Converter={StaticResource StringEqualsConverter}, ConverterParameter={x:Static models:GameMode.X01}}">
+                        <Picker.ItemsSource>
+                            <x:Array Type="{x:Type x:Int32}">
+                                <x:Int32>301</x:Int32>
+                                <x:Int32>501</x:Int32>
+                                <x:Int32>701</x:Int32>
+                            </x:Array>
+                        </Picker.ItemsSource>
+                    </Picker>
                 </VerticalStackLayout>
             </Frame>
 
