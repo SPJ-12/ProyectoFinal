@@ -8,7 +8,7 @@
     Title="ProyectoFinal">
 
     <ShellContent
-        Title="Dardos"
+        Title="FreeDartsGame"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
 

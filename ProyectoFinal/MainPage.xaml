@@ -10,7 +10,7 @@
             Spacing="25">
             <Label
                 Text="Menú Principal"
-                SemanticProperties.HeadingLevel="Level1"
+                SemanticProperties.HeadingLevel="Level2"
                 FontSize="32"
                 TextColor="White"
                 HorizontalOptions="Center" />

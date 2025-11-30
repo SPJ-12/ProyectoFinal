@@ -75,6 +75,15 @@ public class Round : INotifyPropertyChanged
 
     public bool IsComplete => _currentThrowIndex >= 3;
 
+    public void ForceComplete()
+    {
+        // Marcar la ronda como completa forzando el índice a 3
+        if (_currentThrowIndex < 3)
+        {
+            CurrentThrowIndex = 3;
+        }
+    }
+
     public int TotalPoints
     {
         get

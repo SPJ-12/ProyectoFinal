@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace ProyectoFinal.Models;
 
@@ -53,6 +54,7 @@ public class UserStatistics : INotifyPropertyChanged
         }
     }
 
+    [JsonInclude]
     public int TotalGamesPlayed
     {
         get => _totalGamesPlayed;
@@ -68,6 +70,7 @@ public class UserStatistics : INotifyPropertyChanged
         }
     }
 
+    [JsonInclude]
     public int TotalGamesWon
     {
         get => _totalGamesWon;
@@ -82,6 +85,7 @@ public class UserStatistics : INotifyPropertyChanged
         }
     }
 
+    [JsonInclude]
     public double WinPercentage
     {
         get => _winPercentage;
@@ -95,6 +99,7 @@ public class UserStatistics : INotifyPropertyChanged
         }
     }
 
+    [JsonInclude]
     public int TotalThrows
     {
         get => _totalThrows;
@@ -110,6 +115,7 @@ public class UserStatistics : INotifyPropertyChanged
         }
     }
 
+    [JsonInclude]
     public int TotalPoints
     {
         get => _totalPoints;
@@ -124,6 +130,7 @@ public class UserStatistics : INotifyPropertyChanged
         }
     }
 
+    [JsonInclude]
     public double AverageScore
     {
         get => _averageScore;
@@ -137,6 +144,7 @@ public class UserStatistics : INotifyPropertyChanged
         }
     }
 
+    [JsonInclude]
     public int BestScore
     {
         get => _bestScore;
@@ -150,6 +158,7 @@ public class UserStatistics : INotifyPropertyChanged
         }
     }
 
+    [JsonInclude]
     public double AverageTurnsPerGame
     {
         get => _averageTurnsPerGame;
@@ -163,6 +172,7 @@ public class UserStatistics : INotifyPropertyChanged
         }
     }
 
+    [JsonInclude]
     public int TotalRounds
     {
         get => _totalRounds;
@@ -177,6 +187,7 @@ public class UserStatistics : INotifyPropertyChanged
         }
     }
 
+    [JsonInclude]
     public int TotalCricketMarks
     {
         get => _totalCricketMarks;
@@ -191,6 +202,7 @@ public class UserStatistics : INotifyPropertyChanged
         }
     }
 
+    [JsonInclude]
     public double AverageCricketMarks
     {
         get => _averageCricketMarks;
@@ -204,6 +216,7 @@ public class UserStatistics : INotifyPropertyChanged
         }
     }
 
+    [JsonInclude]
     public int X01GamesPlayed
     {
         get => _x01GamesPlayed;
@@ -217,6 +230,7 @@ public class UserStatistics : INotifyPropertyChanged
         }
     }
 
+    [JsonInclude]
     public int X01GamesWon
     {
         get => _x01GamesWon;
@@ -230,6 +244,7 @@ public class UserStatistics : INotifyPropertyChanged
         }
     }
 
+    [JsonInclude]
     public int CricketGamesPlayed
     {
         get => _cricketGamesPlayed;
@@ -243,6 +258,7 @@ public class UserStatistics : INotifyPropertyChanged
         }
     }
 
+    [JsonInclude]
     public int CricketGamesWon
     {
         get => _cricketGamesWon;
@@ -256,6 +272,7 @@ public class UserStatistics : INotifyPropertyChanged
         }
     }
 
+    [JsonInclude]
     public DateTime LastGameDate
     {
         get => _lastGameDate;

@@ -21,6 +21,7 @@ public class DartsGame : INotifyPropertyChanged
     // Sistema de registro de lanzamientos
     private Round _currentRound;
     private int _currentRoundNumber = 1;
+    private int _roundStartScore = 0; // Score del jugador al inicio de la ronda
     
     // Sistema de checkout para X01
     private List<CheckoutCombination> _checkoutCombinations = new();
@@ -376,6 +377,8 @@ public class DartsGame : INotifyPropertyChanged
         if (CurrentPlayer != null && _players.Count > 0)
         {
             _currentRound = new Round(CurrentPlayer.Name, _currentRoundNumber);
+            // Guardar el score del jugador al inicio de la ronda
+            _roundStartScore = CurrentPlayer.Score;
             OnPropertyChanged(nameof(CurrentRound));
             UpdateCheckoutCombinations();
         }
@@ -395,6 +398,26 @@ public class DartsGame : INotifyPropertyChanged
         
         if (success)
         {
+            // Para X01, verificar si este lanzamiento haría el score negativo
+            if (_gameMode == GameMode.X01)
+            {
+                int throwPoints = number * marks;
+                int newScore = CurrentPlayer.Score - throwPoints;
+                
+                if (newScore < 0)
+                {
+                    // Score negativo: revertir todos los puntos de la ronda
+                    // El jugador pierde todos los puntos de esta ronda
+                    RevertRoundPoints();
+                    _currentRound.ForceComplete();
+                    StartCooldown();
+                    return success; // Retornar true porque el lanzamiento se registró
+                }
+            }
+            
+            // Procesar la puntuación del lanzamiento inmediatamente
+            ProcessThrowScore(number, marks);
+            
             // Registrar estadísticas del lanzamiento
             RecordThrowStats(number, marks);
             
@@ -404,10 +427,18 @@ public class DartsGame : INotifyPropertyChanged
                 UpdateCheckoutCombinations();
             }
             
-            // Si la ronda está completa, procesar la puntuación y activar cooldown
+            // Verificar si hay un ganador después de este lanzamiento
+            if (CheckWinner(out string winner))
+            {
+                // Si hay ganador, forzar la ronda a completarse y terminar el juego
+                _currentRound.ForceComplete();
+                // No activar cooldown, el juego termina inmediatamente
+                return success;
+            }
+            
+            // Si la ronda está completa (3 lanzamientos), activar cooldown
             if (_currentRound.IsComplete)
             {
-                ProcessRoundScore();
                 StartCooldown();
             }
         }
@@ -463,11 +494,7 @@ public class DartsGame : INotifyPropertyChanged
             }
             
             // Registrar estadísticas para este usuario específico
-            var userStats = UserService.Instance.GetUserStatistics(CurrentPlayer.UserId);
-            if (userStats != null)
-            {
-                userStats.RecordThrows(points, cricketMarks);
-            }
+            UserService.Instance.RecordThrowsForUser(CurrentPlayer.UserId, points, cricketMarks);
         }
         
         // También registrar para el usuario actual si está logueado (para compatibilidad)
@@ -565,47 +592,61 @@ public class DartsGame : INotifyPropertyChanged
         }
     }
 
-    private void ProcessRoundScore()
+    private void ProcessThrowScore(int number, int marks)
     {
+        // Procesar el lanzamiento individual inmediatamente
         if (_gameMode == GameMode.X01)
         {
-            ProcessX01RoundScore();
+            ProcessX01ThrowScore(number, marks);
         }
         else
         {
-            ProcessCricketRoundScore();
+            // Para Cricket, procesar el score
+            if (CRICKET_NUMBERS.Contains(number))
+            {
+                ProcessCricketScore(number, marks);
+            }
         }
+    }
+
+    private void ProcessX01ThrowScore(int number, int marks)
+    {
+        if (CurrentPlayer == null) return;
+        
+        int throwPoints = number * marks;
+        int newScore = CurrentPlayer.Score - throwPoints;
+        
+        // La validación de score negativo ya se hizo en AddThrow
+        // Aquí solo aplicamos el score (ya sabemos que es válido)
+        CurrentPlayer.Score = newScore;
+    }
+
+    private void RevertRoundPoints()
+    {
+        // Revertir el score del jugador al valor que tenía al inicio de la ronda
+        if (CurrentPlayer != null && _gameMode == GameMode.X01)
+        {
+            CurrentPlayer.Score = _roundStartScore;
+        }
+    }
+
+    private void ProcessRoundScore()
+    {
+        // Este método ya no se usa para procesar puntuaciones en tiempo real
+        // Se mantiene por compatibilidad pero no debería ser necesario
+        // ya que ahora procesamos cada lanzamiento individualmente
     }
 
     private void ProcessX01RoundScore()
     {
-        int roundPoints = _currentRound.TotalPoints;
-        
-        if (CurrentPlayer != null)
-        {
-            if (CurrentPlayer.Score - roundPoints < 0)
-            {
-                // Puntuación inválida - excede el puntaje restante
-                return;
-            }
-            CurrentPlayer.Score -= roundPoints;
-        }
+        // Este método ya no se usa - se procesa cada lanzamiento individualmente
+        // Se mantiene por compatibilidad
     }
 
     private void ProcessCricketRoundScore()
     {
-        // Para Cricket, procesar cada lanzamiento individualmente
-        foreach (var dartThrow in _currentRound.Throws)
-        {
-            if (dartThrow.IsValid)
-            {
-                // Solo procesar números válidos para Cricket
-                if (CRICKET_NUMBERS.Contains(dartThrow.Number))
-                {
-                    ProcessCricketScore(dartThrow.Number, dartThrow.Marks);
-                }
-            }
-        }
+        // Este método ya no se usa - se procesa cada lanzamiento individualmente
+        // Se mantiene por compatibilidad
     }
 
     private void CompleteRound()
@@ -805,12 +846,8 @@ public class DartsGame : INotifyPropertyChanged
             int finalScore = player.Score;
             int roundsPlayed = _currentRoundNumber - 1; // -1 porque _currentRoundNumber ya se incrementó
             
-            // Crear estadísticas temporales para este usuario si no están en el servicio
-            var userStats = UserService.Instance.GetUserStatistics(player.UserId);
-            if (userStats != null)
-            {
-                userStats.RecordGamePlayed(_gameMode, playerWon, finalScore, roundsPlayed);
-            }
+            // Registrar estadísticas del juego para este usuario (con persistencia automática)
+            UserService.Instance.RecordGameForUser(player.UserId, _gameMode, playerWon, finalScore, roundsPlayed);
         }
         
         // También registrar para el usuario actual si está logueado (para compatibilidad)

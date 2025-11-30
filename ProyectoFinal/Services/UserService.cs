@@ -118,6 +118,36 @@ public class UserService
         }
     }
 
+    public void RecordGameForUser(string userId, GameMode gameMode, bool won, int finalScore, int roundsPlayed)
+    {
+        var stats = GetUserStatistics(userId);
+        if (stats != null)
+        {
+            System.Diagnostics.Debug.WriteLine($"Recording game for user {userId}: Mode={gameMode}, Won={won}, Score={finalScore}, Rounds={roundsPlayed}");
+            stats.RecordGamePlayed(gameMode, won, finalScore, roundsPlayed);
+            SaveUserStatistics();
+        }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine($"Warning: Could not find statistics for user {userId}");
+        }
+    }
+
+    public void RecordThrowsForUser(string userId, int points, int cricketMarks = 0)
+    {
+        var stats = GetUserStatistics(userId);
+        if (stats != null)
+        {
+            System.Diagnostics.Debug.WriteLine($"Recording throw for user {userId}: Points={points}, CricketMarks={cricketMarks}");
+            stats.RecordThrows(points, cricketMarks);
+            SaveUserStatistics();
+        }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine($"Warning: Could not find statistics for user {userId}");
+        }
+    }
+
     public bool DeleteUser(string userId)
     {
         var user = _users.FirstOrDefault(u => u.Id == userId);
@@ -188,22 +218,42 @@ public class UserService
         try
         {
             var filePath = Path.Combine(FileSystem.AppDataDirectory, STATISTICS_FILE);
+            System.Diagnostics.Debug.WriteLine($"Loading statistics from: {filePath}");
+            
             if (File.Exists(filePath))
             {
                 var json = File.ReadAllText(filePath);
-                var statistics = JsonSerializer.Deserialize<List<UserStatistics>>(json);
+                System.Diagnostics.Debug.WriteLine($"Statistics file content length: {json.Length} characters");
+                
+                var options = new JsonSerializerOptions 
+                { 
+                    WriteIndented = true,
+                    IncludeFields = false
+                };
+                var statistics = JsonSerializer.Deserialize<List<UserStatistics>>(json, options);
                 if (statistics != null)
                 {
+                    System.Diagnostics.Debug.WriteLine($"Loaded {statistics.Count} user statistics");
                     foreach (var stat in statistics)
                     {
                         _userStatistics.Add(stat);
+                        System.Diagnostics.Debug.WriteLine($"Loaded stats for user: {stat.UserId}, Games: {stat.TotalGamesPlayed}, Throws: {stat.TotalThrows}");
                     }
                 }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Deserialized statistics list is null");
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"Statistics file does not exist at: {filePath}");
             }
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error loading user statistics: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
         }
     }
 
@@ -212,12 +262,35 @@ public class UserService
         try
         {
             var filePath = Path.Combine(FileSystem.AppDataDirectory, STATISTICS_FILE);
-            var json = JsonSerializer.Serialize(_userStatistics.ToList(), new JsonSerializerOptions { WriteIndented = true });
+            System.Diagnostics.Debug.WriteLine($"Saving {_userStatistics.Count} statistics to: {filePath}");
+            
+            var options = new JsonSerializerOptions 
+            { 
+                WriteIndented = true,
+                IncludeFields = false
+            };
+            var json = JsonSerializer.Serialize(_userStatistics.ToList(), options);
+            
+            // Asegurar que el directorio existe
+            var directory = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            
             File.WriteAllText(filePath, json);
+            System.Diagnostics.Debug.WriteLine($"Statistics saved successfully. File size: {new FileInfo(filePath).Length} bytes");
+            
+            // Log de cada estadística guardada
+            foreach (var stat in _userStatistics)
+            {
+                System.Diagnostics.Debug.WriteLine($"Saved stats for user: {stat.UserId}, Games: {stat.TotalGamesPlayed}, Throws: {stat.TotalThrows}");
+            }
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error saving user statistics: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
         }
     }
 }
